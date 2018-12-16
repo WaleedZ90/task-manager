@@ -1,0 +1,8 @@
+@import '../../../styles/abstracts/variables';
+.app-header {
+	text-align: center;
+	padding: 10px;
+	h1 {
+		color: $color-text-primary;
+	}
+}
