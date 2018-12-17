@@ -11,7 +11,7 @@ export default () => (next) => (action) => {
 	// notify that request has been sent
 	next({ ...rest, type: REQUEST });
 
-	return async.request
+	return async
 		.then((resp) => {
 			if (async.successCallback && typeof async.successCallback == 'function') {
 				async.successCallback(resp.data);

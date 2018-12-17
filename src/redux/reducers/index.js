@@ -6,17 +6,9 @@ const initialState = {
 		name: 'John Smith',
 		email: 'john.smith@example.com'
 	},
-	taskCategories: [
-		{
-			id: 1,
-			name: 'Personal'
-		},
-		{
-			id: 2,
-			name: 'Work'
-		}
-	],
-	loadingTaskCategories: false
+	taskCategories: [],
+	loadingTaskCategories: false,
+	taskCategoriesHasError: false
 };
 const rootReducer = (state = initialState, action) => {
 	switch (action.type) {
@@ -24,7 +16,11 @@ const rootReducer = (state = initialState, action) => {
 			return { ...state, loadingTaskCategories: true };
 
 		case consts.FETCH_TASK_CATEGORIES.SUCCESS:
-			return { ...state, loadingTaskCategories: false };
+			const taskCategories = action.resp.data;
+			return { ...state, taskCategories, loadingTaskCategories: false };
+
+		case consts.FETCH_TASK_CATEGORIES.FAILURE:
+			return { ...state, taskCategoriesHasError: true };
 
 		default:
 			return state;
