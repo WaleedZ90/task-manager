@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { filter, groupBy } from 'lodash';
-import TaskService from '../../../services/TaskService';
+import TaskService from '../../services/TaskService';
 import CategoryContainer from './CategoryContainer';
+import TaskItem from './TaskItem';
 import './styles.scss';
 
 function mapStateToProps(state) {
@@ -18,7 +19,7 @@ function mapDispatchToProps(dispatch) {
 class TasksList extends Component {
 	taskService = new TaskService();
 	static defaultProps = {
-		filters: []
+		filters: {}
 	};
 
 	state = {
@@ -27,10 +28,35 @@ class TasksList extends Component {
 		taskCategories: [ { id: 0, name: 'Uncategorized' } ],
 		tasksMapped: [],
 		isLoading: false,
-		hasError: false
+		hasError: false,
+		filters: {
+			name: null,
+			priority: null
+		}
 	};
 
 	componentDidMount() {
+		this.fetchTasks();
+	}
+
+	componentWillReceiveProps(newProps) {
+		// Fetching Categories
+		const { taskCategories, loadingTaskCategories, taskCategoriesHasError, filters } = newProps;
+		if (
+			taskCategories &&
+			Array.isArray(taskCategories) &&
+			taskCategories.length > 0 &&
+			!loadingTaskCategories &&
+			!taskCategoriesHasError
+		) {
+			this.setState({
+				taskCategories: [ ...this.state.taskCategories, ...taskCategories ],
+				filters: { ...this.state.filters, ...filters }
+			});
+		}
+	}
+
+	fetchTasks = () => {
 		let tasksPromise = this.taskService.getTasks();
 		let subTasksPromise = this.taskService.getSubTasks();
 		Promise.all([ tasksPromise, subTasksPromise ])
@@ -42,28 +68,14 @@ class TasksList extends Component {
 			.catch((err) => {
 				this.setState({ hasError: true });
 			});
-	}
-
-	componentWillReceiveProps(newProps) {
-		// Fetching Categories
-		const { taskCategories, loadingTaskCategories, taskCategoriesHasError } = newProps;
-		if (
-			taskCategories &&
-			Array.isArray(taskCategories) &&
-			taskCategories.length > 0 &&
-			!loadingTaskCategories &&
-			!taskCategoriesHasError
-		) {
-			this.setState({ taskCategories: [ ...this.state.taskCategories, ...taskCategories ] });
-		}
-	}
+	};
 
 	mapTasks = () => {
 		const { tasks, subTasks, taskCategories } = this.state;
 		if (taskCategories && tasks && subTasks) {
 			const tasksMapped = tasks.map((task, index) => {
-				const childTasks = filter(subTasks, (subTask) => subTask.taskId == task.id);
-				const category = filter(taskCategories, (category) => category.id == task.categoryId);
+				const childTasks = filter(subTasks, (subTask) => subTask.taskId === task.id);
+				const category = filter(taskCategories, (category) => category.id === task.categoryId);
 				task.category = category[0] != null ? category[0] : { id: 0, name: 'Uncategorized' };
 				return { ...task, childTasks };
 			});
@@ -71,12 +83,26 @@ class TasksList extends Component {
 		}
 	};
 
-	renderTasksByCategory = (categoryId) => {
-		const { tasksMapped } = this.state;
+	groupTasks = (tasksArray, key) => {
+		return groupBy(tasksArray, key);
+	};
+
+	renderTasks = (categoryId) => {
+		const { tasksMapped, filters } = this.state;
+		let filteredTasks = [];
+
+		if (filters.name) {
+			filteredTasks = filter(tasksMapped, (task) => task.name.includes(filters.name));
+		}
+
+		if (filters.priority) {
+			filteredTasks = filter(tasksMapped, (task) => task.priority === filters.priority);
+		}
+
 		if (tasksMapped.length > 0) {
-			const tasksGrouped = groupBy(tasksMapped, 'category.id');
+			const tasksGrouped = this.groupTasks(tasksMapped, 'category.id');
 			const tasksToRender = tasksGrouped[categoryId].map((task, taskIndex) => {
-				return <strong>{task.name}</strong>;
+				return <TaskItem key={taskIndex} task={task} />;
 			});
 
 			return tasksToRender;
@@ -88,7 +114,7 @@ class TasksList extends Component {
 	render() {
 		const { taskCategories, tasksMapped } = this.state;
 
-		if (taskCategories.length == 0 || tasksMapped == 0) {
+		if (taskCategories.length === 0 || tasksMapped === 0) {
 			return null;
 		}
 
@@ -96,8 +122,8 @@ class TasksList extends Component {
 			<article className="tasklist-container">
 				{taskCategories.map((category, index) => {
 					return (
-						<CategoryContainer categoryName={category.name}>
-							{this.renderTasksByCategory(category.id)}
+						<CategoryContainer key={index} categoryName={category.name}>
+							{this.renderTasks(category.id)}
 						</CategoryContainer>
 					);
 				})}

@@ -1,2 +1,18 @@
-$color-text-primary: black;
+$color-text-primary: #3e3d42;
 $color-text-secondary: purple;
+
+$color-text-danger: #dc3545;
+$color-text-warning: #ffc107;
+$color-text-info: #17a2b8;
+
+$color-tab-background: transparent;
+$color-body-background: #fafafa;
+// Shared border radius
+$border-color: #e1e1e1;
+$border-radius: 0;
+$border: 1px solid $border-color;
+
+// Shared box shadow
+$color-box-shadow: #97969b;
+// $box-shadow: 1px 1px 10px 0px $color-box-shadow;
+$box-shadow: none;

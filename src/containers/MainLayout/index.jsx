@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import { fetchTaskCategories } from '../../redux/actions';
 import Header from './Header';
 import Footer from './Footer';
-import LandingPage from '../../components/LandingPage';
-import DetailsPage from '../../components/DetailsPage';
-// import NotFound from '../../components/NotFound';
+import LandingPage from '../LandingPage';
+import DetailsPage from '../DetailsPage';
+// import NotFound from '../NotFound';
 import ErrorBoundary from '../../components/Shared/ErrorBoundary';
 import './styles.scss';
 

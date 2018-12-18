@@ -1,0 +1,24 @@
+@import '../../styles/abstracts/variables';
+.tag-item {
+	font-size: 10px;
+	margin: 10px;
+	vertical-align: middle;
+	border: 1px solid;
+	padding: 6px;
+	border-radius: 20px;
+
+	&-danger {
+		color: $color-text-danger;
+		border-color: $color-text-danger;
+	}
+
+	&-warning {
+		color: $color-text-warning;
+		border-color: $color-text-warning;
+	}
+
+	&-info {
+		color: $color-text-info;
+		border-color: $color-text-info;
+	}
+}

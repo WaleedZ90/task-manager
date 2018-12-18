@@ -1,4 +1,6 @@
 import axios from 'axios';
+import TaskPrioritiesEnum from '../../enums/TaskPrioritiesEnum';
+import { orderBy } from 'lodash';
 
 export default class TaskService {
 	baseUrl = process.env.REACT_APP_API_BASEURL;
@@ -8,7 +10,17 @@ export default class TaskService {
 				method: 'GET',
 				url: `${this.baseUrl}/tasks`
 			}).then((response) => {
-				return response.data;
+				if (response && response.data) {
+					const tasks = response.data.map((task, index) => {
+						const priorityId = TaskPrioritiesEnum[task.priority];
+						return {
+							...task,
+							priorityId
+						};
+					});
+					return orderBy(tasks, [ 'priorityId' ], [ 'desc' ]);
+				}
+				return null;
 			});
 		} catch (error) {
 			return new Error('Failed to retrieve Tasks');

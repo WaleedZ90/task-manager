@@ -1,9 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
-// Sass variables + global styles
-import './styles/index.scss';
+
+// global styles
+import './styles/base/_global.scss';
+
 import 'bootstrap/dist/css/bootstrap.css';
+// Overriding bootstrap styles
+import './styles/base/_bootstrap.custom.scss';
+
 import MainLayout from './containers/MainLayout';
 import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';

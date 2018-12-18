@@ -1,7 +1,7 @@
 import React from 'react';
 import './styles.scss';
 
-import TasksList from '../Shared/TasksList';
+import TasksList from '../../components/TasksList';
 
 const LandingPage = (props) => {
 	return (

@@ -1,5 +1,7 @@
 @import './typography';
+@import '../abstracts/variables';
 
 body {
-	font-family: $main-font;
+	font-family: $main-font !important;
+	background-color: $color-body-background !important;
 }

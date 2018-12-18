@@ -2,6 +2,11 @@
 .app-header {
 	text-align: center;
 	padding: 10px;
+	box-shadow: $box-shadow;
+	background-color: $color-tab-background;
+	border-radius: $border-radius;
+	margin-bottom: 40px;
+	margin-top: 8px;
 	h1 {
 		color: $color-text-primary;
 	}

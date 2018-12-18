@@ -4,7 +4,7 @@ import './styles.scss';
 const Header = (props) => {
 	return (
 		<header className="app-header">
-			<h1>Task Manager</h1>
+			<h1>TASKS</h1>
 		</header>
 	);
 };
