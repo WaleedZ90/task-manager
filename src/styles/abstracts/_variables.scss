@@ -5,11 +5,15 @@ $color-text-danger: #dc3545;
 $color-text-warning: #ffc107;
 $color-text-info: #17a2b8;
 
-$color-tab-background: transparent;
+// Shared backgrounds
+$color-card-background: #fff;
 $color-body-background: #fafafa;
-// Shared border radius
+
+$margin-bottom-card: 10px;
+
+// Shared border
 $border-color: #e1e1e1;
-$border-radius: 0;
+$border-radius: 5px;
 $border: 1px solid $border-color;
 
 // Shared box shadow

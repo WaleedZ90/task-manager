@@ -7,7 +7,7 @@ import Footer from './Footer';
 import LandingPage from '../LandingPage';
 import DetailsPage from '../DetailsPage';
 // import NotFound from '../NotFound';
-import ErrorBoundary from '../../components/Shared/ErrorBoundary';
+import ErrorBoundary from '../../components/ErrorBoundary';
 import './styles.scss';
 
 function mapStateToProps(state) {
@@ -38,7 +38,7 @@ class MainLayout extends Component {
 						</section>
 					</Router>
 				</ErrorBoundary>
-				<Footer />
+				{/* <Footer /> */}
 			</article>
 		);
 	}
