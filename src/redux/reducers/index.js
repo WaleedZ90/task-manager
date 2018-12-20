@@ -1,5 +1,5 @@
 import consts from '../consts';
-// src/js/reducers/index.js
+
 const initialState = {
 	currentUser: {
 		id: 1,
@@ -8,7 +8,21 @@ const initialState = {
 	},
 	taskCategories: [],
 	loadingTaskCategories: false,
-	taskCategoriesHasError: false
+	taskCategoriesHasError: false,
+	taskPriorities: [
+		{
+			id: 1,
+			name: 'low'
+		},
+		{
+			id: 2,
+			name: 'medium'
+		},
+		{
+			id: 3,
+			name: 'high'
+		}
+	]
 };
 const rootReducer = (state = initialState, action) => {
 	switch (action.type) {

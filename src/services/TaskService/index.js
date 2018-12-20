@@ -39,4 +39,63 @@ export default class TaskService {
 			return new Error('Failed to retrieve subtasks');
 		}
 	}
+
+	getTaskById(id = null) {
+		try {
+			if (id == null) throw new Error('there was no id supplied.');
+
+			let taskPromise = axios({
+				method: 'GET',
+				url: `${this.baseUrl}/tasks/${id}`
+			});
+
+			let subTasksPromise = axios({
+				method: 'GET',
+				url: `${this.baseUrl}/tasks/${id}/subtasks`
+			});
+
+			return Promise.all([ taskPromise, subTasksPromise ]).then((values) => {
+				let task = values[0].data;
+				let subtasks = values[1].data;
+				task.childTasks = subtasks;
+				task.priorityId = TaskPrioritiesEnum[task.priority];
+
+				return task;
+			});
+		} catch (error) {
+			return new Error('Failed to retrieve single task');
+		}
+	}
+
+	editTask(id, data) {
+		try {
+			if (id == null) throw new Error('there was no id supplied.');
+
+			return axios({
+				method: 'PATCH',
+				url: `${this.baseUrl}/tasks/${id}`,
+				data
+			}).then((response) => {
+				debugger;
+			});
+		} catch (error) {
+			return new Error('Failed to edit task');
+		}
+	}
+
+	editSubTask(id, data) {
+		try {
+			if (id == null) throw new Error('there was no id supplied.');
+
+			return axios({
+				method: 'PATCH',
+				url: `${this.baseUrl}/subtasks/${id}`,
+				data
+			}).then((response) => {
+				debugger;
+			});
+		} catch (error) {
+			return new Error('Failed to edit subtask');
+		}
+	}
 }

@@ -1,0 +1,15 @@
+@import '../../styles/abstracts/variables';
+.option-item {
+	text-decoration: none;
+	color: $color-text-primary;
+	display: block;
+	margin: 15px;
+	i {
+		margin: 0 7px;
+	}
+
+	&:hover {
+		text-decoration: none;
+		color: $color-text-primary;
+	}
+}

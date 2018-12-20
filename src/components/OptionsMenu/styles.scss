@@ -1,0 +1,27 @@
+@import '../../styles/abstracts/variables';
+.options-menu-container {
+	button {
+		border: none;
+		background-color: transparent;
+		position: relative;
+		outline: none;
+	}
+
+	.options-items-container {
+		position: absolute;
+		right: 0;
+		// padding: 10px;
+		min-width: 85px;
+		background-color: $color-card-background;
+		right: 15px;
+		top: 50px;
+	}
+
+	.show-options-menu {
+		display: block;
+	}
+
+	.hide-options-menu {
+		display: none;
+	}
+}

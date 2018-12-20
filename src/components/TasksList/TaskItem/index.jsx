@@ -1,7 +1,10 @@
 import React from 'react';
 import './styles.scss';
 import Tag from '../../Tag';
+import OptionsMenu from '../../OptionsMenu';
 import TaskPrioritiesEnum from '../../../enums/TaskPrioritiesEnum';
+import OptionItem from '../../OptionItem';
+import OptionItemTypes from '../../../enums/OptionItemTypes';
 
 const TaskItem = (props) => {
 	const { task } = props;
@@ -20,7 +23,16 @@ const TaskItem = (props) => {
 					<span>{task.name}</span>
 					<Tag text={task.priority.toUpperCase()} color={tagColor} />
 				</h3>
-				<i className="fas fa-ellipsis-v" />
+				<OptionsMenu>
+					<OptionItem
+						config={{
+							type: OptionItemTypes.ANCHOR,
+							action: `/tasks/${task.id}`,
+							displayText: 'Edit',
+							icon: 'fas fa-edit'
+						}}
+					/>
+				</OptionsMenu>
 			</header>
 			<section className="subtasks-container">
 				{task.childTasks.map((subTask, index) => {
