@@ -2,9 +2,12 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { filter, groupBy } from 'lodash';
 import TaskService from '../../services/TaskService';
-import CategoryContainer from './CategoryContainer';
+import ToastService from '../../services/ToastService';
 import TaskItem from './TaskItem';
 import './styles.scss';
+
+import { Accordion, AccordionItem, AccordionItemTitle, AccordionItemBody } from 'react-accessible-accordion';
+import './accordion-styles.scss';
 
 function mapStateToProps(state) {
 	return {
@@ -18,6 +21,7 @@ function mapDispatchToProps(dispatch) {
 }
 class TasksList extends Component {
 	taskService = new TaskService();
+	toastService = new ToastService();
 	static defaultProps = {
 		filters: {}
 	};
@@ -87,6 +91,17 @@ class TasksList extends Component {
 		return groupBy(tasksArray, key);
 	};
 
+	updateSubtask = (subTask, e) => {
+		const done = e.target.checked;
+		subTask.done = done;
+		this.taskService.editSubTask(subTask.id, { done }).then((response) => {
+			this.setState({
+				tasksMapped: this.state.tasksMapped
+			});
+			this.toastService.showSuccessToast('Subtask updated!');
+		});
+	};
+
 	renderTasks = (categoryId) => {
 		const { tasksMapped, filters } = this.state;
 		let filteredTasks = [];
@@ -102,7 +117,13 @@ class TasksList extends Component {
 		if (tasksMapped.length > 0) {
 			const tasksGrouped = this.groupTasks(tasksMapped, 'category.id');
 			const tasksToRender = tasksGrouped[categoryId].map((task, taskIndex) => {
-				return <TaskItem key={taskIndex} task={task} />;
+				return (
+					<TaskItem
+						key={taskIndex}
+						task={task}
+						onSubtaskCheck={(subtask, e) => this.updateSubtask(subtask, e)}
+					/>
+				);
 			});
 
 			return tasksToRender;
@@ -120,13 +141,23 @@ class TasksList extends Component {
 
 		return (
 			<article className="tasklist-container">
-				{taskCategories.map((category, index) => {
-					return (
-						<CategoryContainer key={index} categoryName={category.name}>
-							{this.renderTasks(category.id)}
-						</CategoryContainer>
-					);
-				})}
+				<Accordion>
+					{taskCategories.map((category, index) => {
+						return (
+							<AccordionItem expanded={index === 0}>
+								<AccordionItemTitle>
+									<h3>{category.name}</h3>
+									<div className="accordion__arrow" role="presentation" />
+								</AccordionItemTitle>
+								<AccordionItemBody>
+									<section className="container-fluid">
+										<div className="row">{this.renderTasks(category.id)}</div>
+									</section>
+								</AccordionItemBody>
+							</AccordionItem>
+						);
+					})}
+				</Accordion>
 			</article>
 		);
 	}

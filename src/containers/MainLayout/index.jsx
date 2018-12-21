@@ -8,6 +8,8 @@ import LandingPage from '../LandingPage';
 import DetailsPage from '../DetailsPage';
 // import NotFound from '../NotFound';
 import ErrorBoundary from '../../components/ErrorBoundary';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './styles.scss';
 
 function mapStateToProps(state) {
@@ -37,6 +39,7 @@ class MainLayout extends Component {
 							{/* <Route component={NotFound} /> */}
 						</section>
 					</Router>
+					<ToastContainer />
 				</ErrorBoundary>
 				{/* <Footer /> */}
 			</article>

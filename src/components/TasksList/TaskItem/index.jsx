@@ -5,6 +5,7 @@ import OptionsMenu from '../../OptionsMenu';
 import TaskPrioritiesEnum from '../../../enums/TaskPrioritiesEnum';
 import OptionItem from '../../OptionItem';
 import OptionItemTypes from '../../../enums/OptionItemTypes';
+import Checkbox from '../../Checkbox';
 
 const TaskItem = (props) => {
 	const { task } = props;
@@ -39,7 +40,7 @@ const TaskItem = (props) => {
 					const { optional } = subTask;
 					return (
 						<div className="subtask-item">
-							<input type="checkbox" />
+							<Checkbox action={(e) => props.onSubtaskCheck(subTask, e)} value={subTask.done} />
 							<p>
 								<span>{subTask.item}</span>
 								{!optional && <Tag text="REQUIRED" color="danger" />}

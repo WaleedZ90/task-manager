@@ -4,6 +4,11 @@ import TaskService from '../../services/TaskService';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Dropdown from '../../components/Dropdown';
+import Button from '../../components/Button';
+import Checkbox from '../../components/Checkbox';
+import Textbox from '../../components/Textbox';
+import ToastService from '../../services/ToastService';
+import { Link } from 'react-router-dom';
 
 function mapStateToProps(state) {
 	return {
@@ -18,9 +23,14 @@ function mapDispatchToProps(dispatch) {
 }
 class DetailsPage extends Component {
 	taskService = new TaskService();
+	toastService = new ToastService();
 	state = {
 		task: null,
-		taskCategories: []
+		taskCategories: [],
+		newSubtask: {
+			name: '',
+			isOptional: false
+		}
 	};
 
 	componentDidMount() {
@@ -46,11 +56,13 @@ class DetailsPage extends Component {
 		}
 	}
 
-	handleFormSubmit = (e) => {
-		e.preventDefault();
+	saveTaskChanges = () => {
 		const { task } = this.state;
-		// TODO: Handle promise response
-		this.taskService.editTask(task.id, { name: task.name, priority: task.priority, categoryId: task.categoryId });
+		this.taskService
+			.editTask(task.id, { name: task.name, priority: task.priority, categoryId: task.categoryId })
+			.then((response) => {
+				this.toastService.showSuccessToast('Task edited successfully!');
+			});
 	};
 
 	handleNameChange = (e) => {
@@ -80,58 +92,98 @@ class DetailsPage extends Component {
 	};
 
 	saveSubtaskChanges = (subtask) => {
-		// TODO: Handle promise response
-		this.taskService.editSubTask(subtask.id, { item: subtask.item });
+		this.taskService.editSubTask(subtask.id, { item: subtask.item }).then((response) => {
+			this.toastService.showSuccessToast(`Subtask [${subtask.id}]: Successfully edited.`);
+		});
+	};
+
+	handleNewSubtaskName = (e) => {
+		const name = e.target.value;
+		this.setState({ newSubtask: { ...this.state.newSubtask, name } });
+	};
+
+	handleOptionalCheckboxChange = (e) => {
+		const isOptional = e.target.checked;
+		this.setState({ newSubtask: { ...this.state.newSubtask, isOptional } });
+	};
+
+	addNewSubtask = () => {
+		const { task, newSubtask } = this.state;
+		const subtaskToAdd = {
+			item: newSubtask.name,
+			done: false,
+			optional: newSubtask.isOptional
+		};
+
+		this.taskService.addSubTask(task.id, subtaskToAdd).then((response) => {
+			const newSubTask = response.data;
+			this.setState({
+				task: {
+					childTasks: [ ...task.childTasks, newSubTask ]
+				}
+			});
+			this.toastService.showSuccessToast('Subtask added successfully!');
+		});
 	};
 
 	render() {
-		const { task, taskCategories } = this.state;
-		const { taskPriorities } = this.props;
+		const { task, taskCategories, newSubtask } = this.state;
+		const { taskPriorities, loadingTaskCategories } = this.props;
 
-		if (task == null) return null;
+		if (task == null || loadingTaskCategories == true) return null;
 
 		return (
 			<article className="details-page-container">
-				<form onSubmit={this.handleFormSubmit}>
-					<fieldset>
-						<label>Name</label>
-						<input type="text" value={task.name} onChange={this.handleNameChange} />
-					</fieldset>
-					<fieldset>
-						<label>Category</label>
-						<Dropdown
-							items={taskCategories}
-							onChange={this.handleCategoryChange}
-							selectedId={task.categoryId}
-						/>
-					</fieldset>
-					<fieldset>
-						<label>Priority</label>
-						<Dropdown
-							items={taskPriorities}
-							onChange={this.handlePriorityChange}
-							selectedId={task.priorityId}
-						/>
-					</fieldset>
-					{/* TODO: Date */}
+				<section>
+					<Link to={'/'}>Back</Link>
+				</section>
+				<form>
 					<section>
-						<div>add subtask</div>
+						<fieldset>
+							<label>Name</label>
+							<Textbox value={task.name} changeAction={this.handleNameChange} />
+						</fieldset>
+						<fieldset>
+							<label>Category</label>
+							<Dropdown
+								items={taskCategories}
+								onChange={this.handleCategoryChange}
+								selectedId={task.categoryId}
+							/>
+						</fieldset>
+						<fieldset>
+							<label>Priority</label>
+							<Dropdown
+								items={taskPriorities}
+								onChange={this.handlePriorityChange}
+								selectedId={task.priorityId}
+							/>
+						</fieldset>
+						{/* TODO: Date */}
+						<Button displayText="Save" action={this.saveTaskChanges} />
+					</section>
+					<section>
+						<div>
+							<fieldset>
+								<Textbox value={newSubtask.name} changeAction={this.handleNewSubtaskName} />
+								<Checkbox displayText="Optional" action={this.handleOptionalCheckboxChange} />
+								<Button displayText="Add Subtask" action={this.addNewSubtask} />
+							</fieldset>
+						</div>
 						<div>
 							{task.childTasks.map((subtask, subtaskIndex) => {
 								return (
 									<fieldset>
-										<input
-											type="text"
+										<Textbox
 											value={subtask.item}
-											onChange={(e) => this.handleSubTaskNameChange(subtask, e)}
-											onBlur={(e) => this.saveSubtaskChanges(subtask)}
+											changeAction={(e) => this.handleSubTaskNameChange(subtask, e)}
+											blurAction={(e) => this.saveSubtaskChanges(subtask)}
 										/>
 									</fieldset>
 								);
 							})}
 						</div>
 					</section>
-					<button type="submit">Save</button>
 				</form>
 			</article>
 		);

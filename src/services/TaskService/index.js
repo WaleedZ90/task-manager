@@ -33,7 +33,12 @@ export default class TaskService {
 				method: 'GET',
 				url: `${this.baseUrl}/subtasks`
 			}).then((response) => {
-				return response.data;
+				return response.data.map((subtask, index) => {
+					return {
+						...subtask,
+						taskId: Number.parseInt(subtask.taskId)
+					};
+				});
 			});
 		} catch (error) {
 			return new Error('Failed to retrieve subtasks');
@@ -67,6 +72,35 @@ export default class TaskService {
 		}
 	}
 
+	addTask(data) {
+		try {
+			return axios({
+				method: 'POST',
+				url: `${this.baseUrl}/tasks`,
+				data
+			}).then((response) => {
+				return response;
+			});
+		} catch (error) {
+			return new Error('Failed to add task');
+		}
+	}
+
+	addSubTask(taskId, data) {
+		try {
+			if (taskId == null) throw new Error('there was no id supplied.');
+			return axios({
+				method: 'POST',
+				url: `${this.baseUrl}/tasks/${taskId}/subtasks`,
+				data
+			}).then((response) => {
+				return response;
+			});
+		} catch (error) {
+			return new Error('Failed to add subtask');
+		}
+	}
+
 	editTask(id, data) {
 		try {
 			if (id == null) throw new Error('there was no id supplied.');
@@ -76,7 +110,7 @@ export default class TaskService {
 				url: `${this.baseUrl}/tasks/${id}`,
 				data
 			}).then((response) => {
-				debugger;
+				return response;
 			});
 		} catch (error) {
 			return new Error('Failed to edit task');
@@ -92,7 +126,7 @@ export default class TaskService {
 				url: `${this.baseUrl}/subtasks/${id}`,
 				data
 			}).then((response) => {
-				debugger;
+				return response;
 			});
 		} catch (error) {
 			return new Error('Failed to edit subtask');
