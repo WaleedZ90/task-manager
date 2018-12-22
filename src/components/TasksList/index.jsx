@@ -4,6 +4,8 @@ import { filter, groupBy } from 'lodash';
 import TaskService from '../../services/TaskService';
 import ToastService from '../../services/ToastService';
 import TaskItem from './TaskItem';
+import Textbox from '../Textbox';
+import Dropdown from '../Dropdown';
 import './styles.scss';
 
 import { Accordion, AccordionItem, AccordionItemTitle, AccordionItemBody } from 'react-accessible-accordion';
@@ -13,7 +15,8 @@ function mapStateToProps(state) {
 	return {
 		taskCategories: state.taskCategories,
 		loadingTaskCategories: state.loadingTaskCategories,
-		taskCategoriesHasError: state.taskCategoriesHasError
+		taskCategoriesHasError: state.taskCategoriesHasError,
+		taskPriorities: state.taskPriorities
 	};
 }
 function mapDispatchToProps(dispatch) {
@@ -22,21 +25,20 @@ function mapDispatchToProps(dispatch) {
 class TasksList extends Component {
 	taskService = new TaskService();
 	toastService = new ToastService();
-	static defaultProps = {
-		filters: {}
-	};
 
 	state = {
 		tasks: [],
 		subTasks: [],
 		taskCategories: [ { id: 0, name: 'Uncategorized' } ],
+		taskPriorities: [ { id: 0, name: 'None' } ],
 		tasksMapped: [],
 		isLoading: false,
 		hasError: false,
 		filters: {
-			name: null,
-			priority: null
-		}
+			name: '',
+			priority: 0
+		},
+		filtersApplied: false
 	};
 
 	componentDidMount() {
@@ -45,7 +47,7 @@ class TasksList extends Component {
 
 	componentWillReceiveProps(newProps) {
 		// Fetching Categories
-		const { taskCategories, loadingTaskCategories, taskCategoriesHasError, filters } = newProps;
+		const { taskCategories, loadingTaskCategories, taskCategoriesHasError, taskPriorities } = newProps;
 		if (
 			taskCategories &&
 			Array.isArray(taskCategories) &&
@@ -55,7 +57,7 @@ class TasksList extends Component {
 		) {
 			this.setState({
 				taskCategories: [ ...this.state.taskCategories, ...taskCategories ],
-				filters: { ...this.state.filters, ...filters }
+				taskPriorities: [ ...this.state.taskPriorities, ...taskPriorities ]
 			});
 		}
 	}
@@ -102,21 +104,9 @@ class TasksList extends Component {
 		});
 	};
 
-	renderTasks = (categoryId) => {
-		const { tasksMapped, filters } = this.state;
-		let filteredTasks = [];
-
-		if (filters.name) {
-			filteredTasks = filter(tasksMapped, (task) => task.name.includes(filters.name));
-		}
-
-		if (filters.priority) {
-			filteredTasks = filter(tasksMapped, (task) => task.priority === filters.priority);
-		}
-
-		if (tasksMapped.length > 0) {
-			const tasksGrouped = this.groupTasks(tasksMapped, 'category.id');
-			const tasksToRender = tasksGrouped[categoryId].map((task, taskIndex) => {
+	renderTasks = (tasksArray) => {
+		if (tasksArray && Array.isArray(tasksArray)) {
+			return tasksArray.map((task, taskIndex) => {
 				return (
 					<TaskItem
 						key={taskIndex}
@@ -125,15 +115,125 @@ class TasksList extends Component {
 					/>
 				);
 			});
-
-			return tasksToRender;
 		}
 
 		return null;
 	};
 
-	render() {
+	renderTasksCategorized = () => {
 		const { taskCategories, tasksMapped } = this.state;
+		const tasksGrouped = this.groupTasks(tasksMapped, 'category.id');
+		return (
+			<Accordion>
+				{taskCategories.map((category, index) => {
+					return (
+						<AccordionItem expanded={index === 0}>
+							<AccordionItemTitle>
+								<h3>{category.name}</h3>
+								<div className="accordion__arrow" role="presentation" />
+							</AccordionItemTitle>
+							<AccordionItemBody>
+								<section className="container-fluid">
+									<div className="row">{this.renderTasks(tasksGrouped[category.id])}</div>
+								</section>
+							</AccordionItemBody>
+						</AccordionItem>
+					);
+				})}
+			</Accordion>
+		);
+	};
+
+	renderTasksUncategorized = () => {
+		const { tasksMapped, filtersApplied, filters } = this.state;
+		if (filtersApplied) {
+			let tasksFiltered = [];
+
+			if (filters.name != '' && filters.priority > 0) {
+				tasksFiltered = filter(
+					tasksMapped,
+					(task) =>
+						task.name.toLowerCase().includes(filters.name.toLowerCase()) &&
+						task.priorityId === filters.priority
+				);
+
+				return (
+					<section className="container-fluid">
+						<div className="row">{this.renderTasks(tasksFiltered)}</div>
+					</section>
+				);
+			}
+
+			if (filters.name != '') {
+				tasksFiltered = filter(tasksMapped, (task) =>
+					task.name.toLowerCase().includes(filters.name.toLowerCase())
+				);
+
+				return (
+					<section className="container-fluid">
+						<div className="row">{this.renderTasks(tasksFiltered)}</div>
+					</section>
+				);
+			}
+
+			if (filters.priority) {
+				tasksFiltered = filter(tasksMapped, (task) => task.priorityId === filters.priority);
+
+				return (
+					<section className="container-fluid">
+						<div className="row">{this.renderTasks(tasksFiltered)}</div>
+					</section>
+				);
+			}
+
+			return (
+				<section className="container-fluid">
+					<div className="row">{this.renderTasks(tasksMapped)}</div>
+				</section>
+			);
+		}
+
+		return (
+			<section className="container-fluid">
+				<div className="row">{this.renderTasks(tasksMapped)}</div>
+			</section>
+		);
+	};
+
+	handleNameFilterChange = (e) => {
+		const name = e.target.value;
+		const { filters } = this.state;
+		if (name != '') {
+			this.setState({
+				filters: { ...this.state.filters, name },
+				filtersApplied: name != '' || filters.priority > 0
+			});
+		} else {
+			this.setState({
+				filters: { ...this.state.filters, name },
+				filtersApplied: name != '' || filters.priority > 0
+			});
+		}
+	};
+
+	handlePriorityChange = (e) => {
+		const selectedPriority = JSON.parse(e.target.value);
+		const { filters } = this.state;
+		if (selectedPriority.id > 0) {
+			this.setState({
+				filters: { ...this.state.filters, priority: selectedPriority.id },
+				filtersApplied: selectedPriority.id > 0 || filters.name != ''
+			});
+		} else {
+			this.setState({
+				filters: { ...this.state.filters, priority: selectedPriority.id },
+				filtersApplied: selectedPriority.id > 0 || filters.name != ''
+			});
+		}
+	};
+
+	render() {
+		const { filtersApplied, filters, taskCategories, tasksMapped, taskPriorities } = this.state;
 
 		if (taskCategories.length === 0 || tasksMapped === 0) {
 			return null;
@@ -141,23 +241,22 @@ class TasksList extends Component {
 
 		return (
 			<article className="tasklist-container">
-				<Accordion>
-					{taskCategories.map((category, index) => {
-						return (
-							<AccordionItem expanded={index === 0}>
-								<AccordionItemTitle>
-									<h3>{category.name}</h3>
-									<div className="accordion__arrow" role="presentation" />
-								</AccordionItemTitle>
-								<AccordionItemBody>
-									<section className="container-fluid">
-										<div className="row">{this.renderTasks(category.id)}</div>
-									</section>
-								</AccordionItemBody>
-							</AccordionItem>
-						);
-					})}
-				</Accordion>
+				<section className="filters-section container">
+					<div className="row">
+						<div>
+							<Textbox
+								placeholder="Filter by name"
+								value={filters.name}
+								changeAction={this.handleNameFilterChange}
+							/>
+						</div>
+						<div>
+							<Dropdown items={taskPriorities} onChange={this.handlePriorityChange} />
+						</div>
+					</div>
+				</section>
+				{filtersApplied && this.renderTasksUncategorized()}
+				{!filtersApplied && this.renderTasksCategorized()}
 			</article>
 		);
 	}
