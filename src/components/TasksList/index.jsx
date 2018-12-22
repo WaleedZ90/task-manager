@@ -8,7 +8,9 @@ import Textbox from '../Textbox';
 import Dropdown from '../Dropdown';
 import Button from '../Button';
 import Modal from 'react-responsive-modal';
+import TaskPrioritiesEnum from '../../enums/TaskPrioritiesEnum';
 import './styles.scss';
+import styles from './modal-styles.scss';
 
 import { Accordion, AccordionItem, AccordionItemTitle, AccordionItemBody } from 'react-accessible-accordion';
 import './accordion-styles.scss';
@@ -288,6 +290,7 @@ class TasksList extends Component {
 			task.childTasks = [];
 			const category = filter(taskCategories, (category) => category.id === task.categoryId);
 			task.category = category[0] != null ? category[0] : { id: 0, name: 'Uncategorized' };
+			task.priorityId = TaskPrioritiesEnum[task.priority];
 
 			this.setState(
 				{
@@ -311,18 +314,18 @@ class TasksList extends Component {
 		return (
 			<article className="tasklist-container">
 				<section className="filters-section container">
-					<div className="row">
-						<div>
+					<div className="row filters-wrapper">
+						<div className="col-sm-12 col-md-3">
 							<Textbox
 								placeholder="Filter by name"
 								value={filters.name}
 								changeAction={this.handleNameFilterChange}
 							/>
 						</div>
-						<div>
+						<div className="col-sm-12 col-md-3">
 							<Dropdown items={taskPriorities} onChange={this.handlePriorityChange} />
 						</div>
-						<div>
+						<div className="col-sm-12 col-md-5">
 							<Button displayText="Add Task" action={this.openModal} />
 						</div>
 					</div>
@@ -330,7 +333,7 @@ class TasksList extends Component {
 				{filtersApplied && this.renderTasksUncategorized()}
 				{!filtersApplied && this.renderTasksCategorized()}
 
-				<Modal open={openModal} onClose={this.closeModal} focusTrapped>
+				<Modal open={openModal} onClose={this.closeModal} focusTrapped classNames={{ modal: 'customModal' }}>
 					<h2>Add new Task</h2>
 					<form>
 						<fieldset>
@@ -349,7 +352,9 @@ class TasksList extends Component {
 							<label>Category</label>
 							<Dropdown items={taskCategories} onChange={this.handleFormCategoryChange} />
 						</fieldset>
-						<Button displayText="Add Task" action={this.addNewTask} />
+						<fieldset className="add-button-section">
+							<Button displayText="Add Task" action={this.addNewTask} />
+						</fieldset>
 					</form>
 				</Modal>
 			</article>

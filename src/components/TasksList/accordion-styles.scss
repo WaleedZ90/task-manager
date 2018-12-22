@@ -8,8 +8,8 @@
 }
 
 .accordion {
-	border: 1px solid rgba(0, 0, 0, 0.1);
-	border-radius: 2px;
+	// border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: $border-radius;
 }
 
 .accordion__item {
@@ -25,13 +25,16 @@
 }
 
 .accordion__title {
-	background-color: #f4f4f4;
+	// background-color: #f4f4f4;
 	color: #444;
 	cursor: pointer;
 	padding: 18px;
 	width: 100%;
 	text-align: left;
-	border: none;
+	// border: none;
+	border-bottom: $border;
+	border-color: $border-color;
+	outline: none;
 }
 
 .accordion__title:hover {

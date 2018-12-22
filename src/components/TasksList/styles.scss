@@ -1,0 +1,19 @@
+@import '../../styles/abstracts/variables';
+.tasklist-container {
+	.filters-section {
+		border-bottom: $border;
+		border-color: $border-color;
+		padding: 20px;
+
+		.filters-wrapper {
+			div {
+				padding: 0;
+				margin: 0 5px;
+				input,
+				select {
+					height: 100%;
+				}
+			}
+		}
+	}
+}

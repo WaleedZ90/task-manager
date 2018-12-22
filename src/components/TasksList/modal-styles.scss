@@ -1,0 +1,21 @@
+@import '../../styles/abstracts/variables';
+.customModal {
+	width: 800px;
+	form {
+		fieldset {
+			margin-bottom: $margin-bottom-card;
+		}
+		.add-button-section {
+			display: flex;
+			padding: 10px 0;
+			margin: 0;
+			border-top: $border;
+			border-color: $border-color;
+			margin-top: 30px;
+
+			button {
+				margin-left: auto;
+			}
+		}
+	}
+}
