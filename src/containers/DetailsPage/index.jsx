@@ -8,7 +8,8 @@ import Button from '../../components/Button';
 import Checkbox from '../../components/Checkbox';
 import Textbox from '../../components/Textbox';
 import ToastService from '../../services/ToastService';
-import { Link } from 'react-router-dom';
+import { filter } from 'lodash';
+import Anchor from '../../components/Anchor';
 
 function mapStateToProps(state) {
 	return {
@@ -36,24 +37,20 @@ class DetailsPage extends Component {
 	componentDidMount() {
 		const taskId = this.props.match.params.id;
 		this.taskService.getTaskById(taskId).then((response) => {
-			this.setState({ task: response });
+			const { taskCategories } = this.state;
+			const task = response;
+			const category = filter(taskCategories, (category) => category.id === task.categoryId);
+			task.category = category[0] != null ? category[0] : { id: 0, name: 'Uncategorized' };
+			this.setState({ task });
 		});
 	}
 
-	componentWillReceiveProps(newProps) {
-		// Fetching Categories
-		const { taskCategories, loadingTaskCategories, taskCategoriesHasError } = newProps;
-		if (
-			taskCategories &&
-			Array.isArray(taskCategories) &&
-			taskCategories.length > 0 &&
-			!loadingTaskCategories &&
-			!taskCategoriesHasError
-		) {
-			this.setState({
-				taskCategories: [ ...this.state.taskCategories, ...taskCategories ]
-			});
-		}
+	static getDerivedStateFromProps(nextProps, prevState) {
+		const { taskCategories, taskPriorities } = nextProps;
+		return {
+			taskCategories,
+			taskPriorities
+		};
 	}
 
 	saveTaskChanges = () => {
@@ -68,6 +65,11 @@ class DetailsPage extends Component {
 	handleNameChange = (e) => {
 		const name = e.target.value;
 		this.setState({ task: { ...this.state.task, name } });
+	};
+
+	handleDueDateChange = (e) => {
+		const dueDate = e.target.value;
+		this.setState({ task: { ...this.state.task, dueDate } });
 	};
 
 	handleCategoryChange = (e) => {
@@ -103,7 +105,7 @@ class DetailsPage extends Component {
 	};
 
 	handleOptionalCheckboxChange = (e) => {
-		const isOptional = e.target.checked;
+		const isOptional = e;
 		this.setState({ newSubtask: { ...this.state.newSubtask, isOptional } });
 	};
 
@@ -134,8 +136,8 @@ class DetailsPage extends Component {
 
 		return (
 			<article className="details-page-container">
-				<section>
-					<Link to={'/'}>Back</Link>
+				<section className="back-section">
+					<Anchor to={'/'} displayText={'Back'} />
 				</section>
 				<form>
 					<section>
@@ -159,7 +161,10 @@ class DetailsPage extends Component {
 								selectedId={task.priorityId}
 							/>
 						</fieldset>
-						{/* TODO: Date */}
+						<fieldset>
+							<label>Due Date</label>
+							<Textbox value={task.dueDate} changeAction={this.handleDueDateChange} />
+						</fieldset>
 						<Button displayText="Save" action={this.saveTaskChanges} />
 					</section>
 					<section>

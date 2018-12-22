@@ -1,0 +1,9 @@
+@import '../../styles/abstracts/variables';
+.shared-button {
+	border: $border;
+	border-color: $color-text-primary;
+	color: $color-text-primary;
+	padding: 10px;
+	border-radius: $border-radius;
+	background-color: transparent;
+}

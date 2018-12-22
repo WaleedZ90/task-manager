@@ -6,10 +6,11 @@ const initialState = {
 		name: 'John Smith',
 		email: 'john.smith@example.com'
 	},
-	taskCategories: [],
+	taskCategories: [ { id: 0, name: 'Uncategorized' } ],
 	loadingTaskCategories: false,
 	taskCategoriesHasError: false,
 	taskPriorities: [
+		{ id: 0, name: 'None' },
 		{
 			id: 1,
 			name: 'low'
@@ -30,7 +31,7 @@ const rootReducer = (state = initialState, action) => {
 			return { ...state, loadingTaskCategories: true };
 
 		case consts.FETCH_TASK_CATEGORIES.SUCCESS:
-			const taskCategories = action.resp.data;
+			const taskCategories = [ ...state.taskCategories, ...action.resp.data ];
 			return { ...state, taskCategories, loadingTaskCategories: false };
 
 		case consts.FETCH_TASK_CATEGORIES.FAILURE:

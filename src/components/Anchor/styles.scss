@@ -1,0 +1,14 @@
+@import '../../styles/abstracts/variables';
+.shared-anchor {
+	text-decoration: none;
+	border: $border;
+	border-color: $color-text-info;
+	color: $color-text-info;
+	padding: 10px;
+	border-radius: $border-radius;
+
+	&:hover {
+		text-decoration: none;
+		color: $color-text-info;
+	}
+}

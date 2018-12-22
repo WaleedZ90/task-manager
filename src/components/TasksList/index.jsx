@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { filter, groupBy } from 'lodash';
+import { filter, groupBy, remove, clone } from 'lodash';
 import TaskService from '../../services/TaskService';
 import ToastService from '../../services/ToastService';
 import TaskItem from './TaskItem';
 import Textbox from '../Textbox';
 import Dropdown from '../Dropdown';
+import Button from '../Button';
+import Modal from 'react-responsive-modal';
 import './styles.scss';
 
 import { Accordion, AccordionItem, AccordionItemTitle, AccordionItemBody } from 'react-accessible-accordion';
@@ -29,7 +31,7 @@ class TasksList extends Component {
 	state = {
 		tasks: [],
 		subTasks: [],
-		taskCategories: [ { id: 0, name: 'Uncategorized' } ],
+		taskCategories: [],
 		taskPriorities: [ { id: 0, name: 'None' } ],
 		tasksMapped: [],
 		isLoading: false,
@@ -38,28 +40,26 @@ class TasksList extends Component {
 			name: '',
 			priority: 0
 		},
-		filtersApplied: false
+		filtersApplied: false,
+		openModal: false,
+		newTask: {
+			name: '',
+			priority: null,
+			categoryId: null,
+			dueDate: ''
+		}
 	};
 
 	componentDidMount() {
 		this.fetchTasks();
 	}
 
-	componentWillReceiveProps(newProps) {
-		// Fetching Categories
-		const { taskCategories, loadingTaskCategories, taskCategoriesHasError, taskPriorities } = newProps;
-		if (
-			taskCategories &&
-			Array.isArray(taskCategories) &&
-			taskCategories.length > 0 &&
-			!loadingTaskCategories &&
-			!taskCategoriesHasError
-		) {
-			this.setState({
-				taskCategories: [ ...this.state.taskCategories, ...taskCategories ],
-				taskPriorities: [ ...this.state.taskPriorities, ...taskPriorities ]
-			});
-		}
+	static getDerivedStateFromProps(nextProps, prevState) {
+		const { taskCategories, taskPriorities } = nextProps;
+		return {
+			taskCategories,
+			taskPriorities
+		};
 	}
 
 	fetchTasks = () => {
@@ -94,7 +94,7 @@ class TasksList extends Component {
 	};
 
 	updateSubtask = (subTask, e) => {
-		const done = e.target.checked;
+		const done = e;
 		subTask.done = done;
 		this.taskService.editSubTask(subTask.id, { done }).then((response) => {
 			this.setState({
@@ -107,11 +107,13 @@ class TasksList extends Component {
 	renderTasks = (tasksArray) => {
 		if (tasksArray && Array.isArray(tasksArray)) {
 			return tasksArray.map((task, taskIndex) => {
+				const showBorderBottom = tasksArray[taskIndex + 1] != null;
 				return (
 					<TaskItem
 						key={taskIndex}
 						task={task}
 						onSubtaskCheck={(subtask, e) => this.updateSubtask(subtask, e)}
+						showBorderBottom={showBorderBottom}
 					/>
 				);
 			});
@@ -121,8 +123,14 @@ class TasksList extends Component {
 	};
 
 	renderTasksCategorized = () => {
-		const { taskCategories, tasksMapped } = this.state;
+		const { tasksMapped } = this.state;
 		const tasksGrouped = this.groupTasks(tasksMapped, 'category.id');
+
+		let taskCategories = clone(this.state.taskCategories);
+		remove(taskCategories, (category) => {
+			return tasksGrouped[category.id] == null;
+		});
+
 		return (
 			<Accordion>
 				{taskCategories.map((category, index) => {
@@ -232,10 +240,71 @@ class TasksList extends Component {
 		}
 	};
 
-	render() {
-		const { filtersApplied, filters, taskCategories, tasksMapped, taskPriorities } = this.state;
+	openModal = () => {
+		this.setState({ openModal: true });
+	};
 
-		if (taskCategories.length === 0 || tasksMapped === 0) {
+	closeModal = () => {
+		this.setState({ openModal: false });
+	};
+
+	handleFormNameChange = (e) => {
+		const name = e.target.value;
+		this.setState({ newTask: { ...this.state.newTask, name } });
+	};
+
+	handleFormDueDateChange = (e) => {
+		const dueDate = e.target.value;
+		this.setState({ newTask: { ...this.state.newTask, dueDate } });
+	};
+
+	handleFormPriorityChange = (e) => {
+		const selectedPriority = JSON.parse(e.target.value);
+		let priority = null;
+		if (selectedPriority.id == 0) {
+			this.setState({ newTask: { ...this.state.newTask, priority } });
+		} else {
+			priority = selectedPriority.name;
+			this.setState({ newTask: { ...this.state.newTask, priority } });
+		}
+	};
+
+	handleFormCategoryChange = (e) => {
+		const selectedCategory = JSON.parse(e.target.value);
+		let categoryId = null;
+		if (selectedCategory.id == 0) {
+			this.setState({ newTask: { ...this.state.newTask, categoryId } });
+		} else {
+			categoryId = selectedCategory.id;
+			this.setState({ newTask: { ...this.state.newTask, categoryId } });
+		}
+	};
+
+	addNewTask = () => {
+		const { newTask } = this.state;
+		this.taskService.addTask(newTask).then((response) => {
+			const { taskCategories } = this.state;
+			let task = response.data;
+			task.childTasks = [];
+			const category = filter(taskCategories, (category) => category.id === task.categoryId);
+			task.category = category[0] != null ? category[0] : { id: 0, name: 'Uncategorized' };
+
+			this.setState(
+				{
+					tasksMapped: [ ...this.state.tasksMapped, task ]
+				},
+				() => {
+					this.closeModal();
+					this.toastService.showSuccessToast('Task added successfully!');
+				}
+			);
+		});
+	};
+
+	render() {
+		const { filtersApplied, filters, taskCategories, tasksMapped, taskPriorities, openModal, newTask } = this.state;
+
+		if (taskCategories.length === 0 || tasksMapped.length === 0) {
 			return null;
 		}
 
@@ -253,10 +322,36 @@ class TasksList extends Component {
 						<div>
 							<Dropdown items={taskPriorities} onChange={this.handlePriorityChange} />
 						</div>
+						<div>
+							<Button displayText="Add Task" action={this.openModal} />
+						</div>
 					</div>
 				</section>
 				{filtersApplied && this.renderTasksUncategorized()}
 				{!filtersApplied && this.renderTasksCategorized()}
+
+				<Modal open={openModal} onClose={this.closeModal} focusTrapped>
+					<h2>Add new Task</h2>
+					<form>
+						<fieldset>
+							<label>Name</label>
+							<Textbox value={newTask.name} changeAction={this.handleFormNameChange} />
+						</fieldset>
+						<fieldset>
+							<label>Due date</label>
+							<Textbox value={newTask.dueDate} changeAction={this.handleFormDueDateChange} />
+						</fieldset>
+						<fieldset>
+							<label>Priority</label>
+							<Dropdown items={taskPriorities} onChange={this.handleFormPriorityChange} />
+						</fieldset>
+						<fieldset>
+							<label>Category</label>
+							<Dropdown items={taskCategories} onChange={this.handleFormCategoryChange} />
+						</fieldset>
+						<Button displayText="Add Task" action={this.addNewTask} />
+					</form>
+				</Modal>
 			</article>
 		);
 	}
