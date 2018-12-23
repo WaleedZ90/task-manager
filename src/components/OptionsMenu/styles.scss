@@ -5,6 +5,7 @@
 		background-color: transparent;
 		position: relative;
 		outline: none;
+		color: $color-text-primary;
 	}
 
 	.options-items-container {
@@ -15,6 +16,9 @@
 		right: 15px;
 		top: 50px;
 		z-index: 9;
+		border: $border;
+		border-radius: $border-radius;
+		border-color: $border-color;
 	}
 
 	.show-options-menu {

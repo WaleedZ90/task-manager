@@ -8,37 +8,37 @@
 }
 
 .accordion {
-	// border: 1px solid rgba(0, 0, 0, 0.1);
 	border-radius: $border-radius;
+	box-shadow: $box-shadow;
 }
 
 .accordion__item {
 	position: relative;
 }
 
-.accordion__item + .accordion__item {
-	border-top: 1px solid rgba(0, 0, 0, 0.1);
-}
+// .accordion__item + .accordion__item {
+// }
 
 .accordion__item--has-icon {
 	position: relative;
 }
 
 .accordion__title {
-	// background-color: #f4f4f4;
-	color: #444;
+	color: $color-text-primary;
 	cursor: pointer;
 	padding: 18px;
 	width: 100%;
 	text-align: left;
-	// border: none;
+	// box-shadow: $box-shadow;
+	outline: none;
+	background-color: $color-card-background;
+	// margin-bottom: $margin-bottom-card;
 	border-bottom: $border;
 	border-color: $border-color;
-	outline: none;
 }
 
 .accordion__title:hover {
-	background-color: #ddd;
+	background-color: #edf0ff;
 }
 
 .accordion__body {
@@ -55,7 +55,7 @@
 
 .accordion__title > *:last-child,
 .accordion__body > *:last-child {
-	margin-bottom: 0;
+	margin-bottom: $margin-bottom-card;
 }
 
 .accordion__arrow {

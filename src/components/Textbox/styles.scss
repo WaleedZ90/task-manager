@@ -1,0 +1,7 @@
+@import '../../styles/abstracts/variables';
+.shared-textbox {
+	color: $color-text-primary;
+	border: $border;
+	border-color: $border-color;
+	border-radius: $border-radius;
+}

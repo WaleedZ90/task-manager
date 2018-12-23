@@ -134,23 +134,35 @@ class TasksList extends Component {
 		});
 
 		return (
-			<Accordion>
+			// <Accordion>
+			// 	{taskCategories.map((category, index) => {
+			// 		return (
+			// 			<AccordionItem expanded={index === 0}>
+			// 				<AccordionItemTitle>
+			// 					<h3>{category.name}</h3>
+			// 					<div className="accordion__arrow" role="presentation" />
+			// 				</AccordionItemTitle>
+			// 				<AccordionItemBody>
+			// 					<section className="container-fluid tasks-container">
+			// 						<div className="row">{this.renderTasks(tasksGrouped[category.id])}</div>
+			// 					</section>
+			// 				</AccordionItemBody>
+			// 			</AccordionItem>
+			// 		);
+			// 	})}
+			// </Accordion>
+			<section className="tasks-categorized-section">
 				{taskCategories.map((category, index) => {
 					return (
-						<AccordionItem expanded={index === 0}>
-							<AccordionItemTitle>
-								<h3>{category.name}</h3>
-								<div className="accordion__arrow" role="presentation" />
-							</AccordionItemTitle>
-							<AccordionItemBody>
-								<section className="container-fluid">
-									<div className="row">{this.renderTasks(tasksGrouped[category.id])}</div>
-								</section>
-							</AccordionItemBody>
-						</AccordionItem>
+						<React.Fragment>
+							<h3 className="list-header">{category.name}</h3>
+							<section className="container-fluid tasks-container">
+								<div className="row">{this.renderTasks(tasksGrouped[category.id])}</div>
+							</section>
+						</React.Fragment>
 					);
 				})}
-			</Accordion>
+			</section>
 		);
 	};
 
@@ -168,7 +180,7 @@ class TasksList extends Component {
 				);
 
 				return (
-					<section className="container-fluid">
+					<section className="container-fluid tasks-uncategorized">
 						<div className="row">{this.renderTasks(tasksFiltered)}</div>
 					</section>
 				);
@@ -180,7 +192,7 @@ class TasksList extends Component {
 				);
 
 				return (
-					<section className="container-fluid">
+					<section className="container-fluid tasks-uncategorized">
 						<div className="row">{this.renderTasks(tasksFiltered)}</div>
 					</section>
 				);
@@ -190,21 +202,21 @@ class TasksList extends Component {
 				tasksFiltered = filter(tasksMapped, (task) => task.priorityId === filters.priority);
 
 				return (
-					<section className="container-fluid">
+					<section className="container-fluid tasks-uncategorized">
 						<div className="row">{this.renderTasks(tasksFiltered)}</div>
 					</section>
 				);
 			}
 
 			return (
-				<section className="container-fluid">
+				<section className="container-fluid tasks-uncategorized">
 					<div className="row">{this.renderTasks(tasksMapped)}</div>
 				</section>
 			);
 		}
 
 		return (
-			<section className="container-fluid">
+			<section className="container-fluid tasks-uncategorized">
 				<div className="row">{this.renderTasks(tasksMapped)}</div>
 			</section>
 		);

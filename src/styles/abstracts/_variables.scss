@@ -1,4 +1,4 @@
-$color-text-primary: #3e3d42;
+$color-text-primary: #5e547d;
 $color-text-secondary: #fff;
 
 $color-text-danger: #dc3545;
@@ -6,17 +6,19 @@ $color-text-warning: #ffc107;
 $color-text-info: #17a2b8;
 
 // Shared backgrounds
-$color-card-background: #fff;
-$color-body-background: #fafafa;
+$color-card-background: #ffffff;
+$color-card-background-secondary: #edf0ff;
+$color-body-background: #f5f6fa;
 
 $margin-bottom-card: 10px;
 
 // Shared border
-$border-color: #e1e1e1;
+$border-color: #eaeaf1;
 $border-radius: 5px;
 $border: 1px solid;
+// $border: none;
 
 // Shared box shadow
 $color-box-shadow: #97969b;
-// $box-shadow: 1px 1px 10px 0px $color-box-shadow;
-$box-shadow: none;
+$box-shadow: 1px 1px 10px 0px $color-box-shadow;
+// $box-shadow: none;

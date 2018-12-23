@@ -1,1 +1,7 @@
-
+@import '../../styles/abstracts/variables';
+.shared-dropdown-select {
+	color: $color-text-primary;
+	border: $border;
+	border-color: $border-color;
+	border-radius: $border-radius;
+}

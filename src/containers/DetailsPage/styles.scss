@@ -1,0 +1,37 @@
+@import '../../styles/abstracts/variables';
+.details-page-container {
+	.back-section {
+		margin: 25px 0;
+	}
+	form {
+		background-color: $color-card-background;
+		box-shadow: $box-shadow;
+		padding: 20px;
+		color: $color-text-primary;
+		border-radius: $border-radius;
+		fieldset {
+			margin-bottom: $margin-bottom-card;
+			label {
+				font-weight: 600;
+			}
+		}
+
+		.task-edit-section {
+			border-bottom: $border;
+			border-color: $border-color;
+			padding: 25px 0px;
+		}
+
+		.subtasks-edit-section {
+			padding: 25px 0px;
+		}
+	}
+
+	.add-subtask-section {
+		width: 100%;
+		fieldset {
+			display: flex;
+			flex-wrap: wrap;
+		}
+	}
+}

@@ -1,7 +1,6 @@
 @import '../../../styles/abstracts/variables';
 .task-item {
 	padding: 10px;
-	// margin-left: 8px;
 	margin-bottom: $margin-bottom-card;
 	// border: $border;
 	// border-radius: $border-radius;
@@ -13,6 +12,7 @@
 
 		h3 {
 			font-size: 1.5rem;
+			color: $color-text-primary;
 		}
 
 		i {
@@ -28,6 +28,7 @@
 			display: flex;
 			align-items: center;
 			padding: 10px 0;
+			color: $color-text-primary;
 
 			p {
 				margin-bottom: 0;

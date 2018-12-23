@@ -6,7 +6,7 @@ const Textbox = (props) => {
 	if (blurAction != null && typeof blurAction == 'function') {
 		return (
 			<input
-				className="form-control"
+				className="form-control shared-textbox"
 				type="text"
 				value={value}
 				onChange={changeAction}
@@ -17,7 +17,13 @@ const Textbox = (props) => {
 	}
 
 	return (
-		<input className="form-control" type="text" value={value} onChange={changeAction} placeholder={placeholder} />
+		<input
+			className="form-control shared-textbox"
+			type="text"
+			value={value}
+			onChange={changeAction}
+			placeholder={placeholder}
+		/>
 	);
 };
 

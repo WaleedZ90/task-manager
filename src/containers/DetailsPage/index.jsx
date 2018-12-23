@@ -116,13 +116,13 @@ class DetailsPage extends Component {
 			done: false,
 			optional: newSubtask.isOptional
 		};
+		debugger;
 
 		this.taskService.addSubTask(task.id, subtaskToAdd).then((response) => {
 			const newSubTask = response.data;
+			task.childTasks.push(newSubTask);
 			this.setState({
-				task: {
-					childTasks: [ ...task.childTasks, newSubTask ]
-				}
+				task
 			});
 			this.toastService.showSuccessToast('Subtask added successfully!');
 		});
@@ -140,7 +140,7 @@ class DetailsPage extends Component {
 					<Anchor to={'/'} displayText={'Back'} />
 				</section>
 				<form>
-					<section>
+					<section className="task-edit-section">
 						<fieldset>
 							<label>Name</label>
 							<Textbox value={task.name} changeAction={this.handleNameChange} />
@@ -167,10 +167,14 @@ class DetailsPage extends Component {
 						</fieldset>
 						<Button displayText="Save" action={this.saveTaskChanges} />
 					</section>
-					<section>
-						<div>
+					<section className="subtasks-edit-section">
+						<div className="add-subtask-section">
 							<fieldset>
-								<Textbox value={newSubtask.name} changeAction={this.handleNewSubtaskName} />
+								<Textbox
+									value={newSubtask.name}
+									placeholder={'Subtask info'}
+									changeAction={this.handleNewSubtaskName}
+								/>
 								<Checkbox displayText="Optional" action={this.handleOptionalCheckboxChange} />
 								<Button displayText="Add Subtask" action={this.addNewSubtask} />
 							</fieldset>
