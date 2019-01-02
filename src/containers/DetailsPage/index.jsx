@@ -141,6 +141,7 @@ class DetailsPage extends Component {
 				</section>
 				<form>
 					<section className="task-edit-section">
+						<h2>Parent Task</h2>
 						<fieldset>
 							<label>Name</label>
 							<Textbox value={task.name} changeAction={this.handleNameChange} />
@@ -168,6 +169,7 @@ class DetailsPage extends Component {
 						<Button displayText="Save" action={this.saveTaskChanges} />
 					</section>
 					<section className="subtasks-edit-section">
+						<h2>Subtasks</h2>
 						<div className="add-subtask-section">
 							<fieldset>
 								<Textbox
@@ -175,10 +177,15 @@ class DetailsPage extends Component {
 									placeholder={'Subtask info'}
 									changeAction={this.handleNewSubtaskName}
 								/>
+							</fieldset>
+							<fieldset>
 								<Checkbox displayText="Optional" action={this.handleOptionalCheckboxChange} />
+							</fieldset>
+							<fieldset>
 								<Button displayText="Add Subtask" action={this.addNewSubtask} />
 							</fieldset>
 						</div>
+						<hr />
 						<div>
 							{task.childTasks.map((subtask, subtaskIndex) => {
 								return (

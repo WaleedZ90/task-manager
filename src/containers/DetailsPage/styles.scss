@@ -29,9 +29,16 @@
 
 	.add-subtask-section {
 		width: 100%;
+		display: flex;
+		flex-wrap: wrap;
+		margin-bottom: $margin-bottom-card;
 		fieldset {
-			display: flex;
-			flex-wrap: wrap;
+			margin: 0 10px;
+		}
+
+		fieldset:nth-child(1) {
+			width: 50%;
+			margin-left: 0;
 		}
 	}
 }
